@@ -319,14 +319,18 @@ function submitWord() {
 }
 
 function undo() {
-    playSound("undo");
-
     if (HISTORY.length <= 0) {
+        if (WORD_INPUT.value === "") {
+            playSound("submit-fail");
+            return;
+        }
         // Just clear the input
+        playSound("undo");
         WORD_INPUT.value = "";
         return;
     }
 
+    playSound("undo");
     let lastWord = HISTORY.pop();
     sessionStorage.setItem("history", HISTORY.toString());
 

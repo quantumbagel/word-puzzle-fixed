@@ -102,15 +102,60 @@ body {
 
 #victoryFlex {
     position: absolute;
+    left: 50%;
     transform: translate(-50%, 0);
-    bottom: -1cap;
+    bottom: 0cap;
 
     gap: 0.25cap;
 
+    overflow-x: visible;
     overflow-y: auto;
-    height: 50vh;
+    height: 55vh;
 
     scrollbar-gutter: stable both-edges;
+}
+
+#victoryScrollContainer {
+    position: absolute;
+    transform: translate(-50%, 0);
+    bottom: -1cap;
+
+    height: 55vh;
+    width: 7em;
+}
+
+#historyContainer {
+    position: absolute;
+    transform: translate(-50%, 0);
+    bottom: -1cap;
+
+    overflow-x: visible;
+    overflow-y: hidden;
+    height: 55vh;
+    width: 7ch;
+
+    /* Prevent it from intercepting clicks */
+    pointer-events: none;
+}
+
+/* Ensures all history displays are centered */
+#historyContainer > * {
+    left: 50%;
+}
+
+.scroll-fade::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 16px;
+    pointer-events: none;
+    background: linear-gradient(
+            to bottom,
+            white,
+            transparent
+    );
 }
 
 #moveCounter {

@@ -15,7 +15,7 @@ const CLOSE_HELP_BUTTON = document.getElementById("closeHelp");
 const FAKE_CARET = document.getElementById("caret");
 
 let MOBILE_MODE = null;
-const WORD_DISPLAY_OFFSET = -2.25; // in cap
+const WORD_DISPLAY_OFFSET = 2.25; // in cap
 
 /* Animation Functions */
 
@@ -29,6 +29,7 @@ function beginGameAnimation() {
     targetContainer.style.animation = "none";
 
     let gameContainer = document.getElementById("gameContainer");
+    gameContainer.style.animation = "none";
     gameContainer.hidden = false;
 
     INPUT_CONTAINER.hidden = true;
@@ -73,6 +74,10 @@ function resumeGameAnimation() {
     gameContainer.hidden = false;
     gameContainer.style.animation = "reveal 3s ease-in-out";
 
+    let historyContainer = document.getElementById("historyContainer");
+    historyContainer.hidden = false;
+    historyContainer.style.animation = "reveal 3s ease-in-out";
+
     let keyboardContainer = document.getElementById("keyboardContainer");
     keyboardContainer.hidden = false;
     keyboardContainer.style.animation = "reveal 3s ease-in-out";
@@ -105,14 +110,14 @@ function victoryAnimation() {
 
     let firstBlock = constructWordDisplay(STARTING_WORD);
     firstBlock.classList.add("static", "startingWord");
-    firstBlock.style.top = "";
+    firstBlock.style.bottom = "";
     victoryFlex.append(firstBlock);
 
     for (const word of HISTORY) {
         let newBlock = constructWordDisplay(word);
         newBlock.classList.add("wordHistory");
         newBlock.classList.add("static");
-        newBlock.style.top = "";
+        newBlock.style.bottom = "";
 
         victoryFlex.append(newBlock);
     }
@@ -182,7 +187,7 @@ function formatHistory() {
     let historyList = historyContainer.children;
     let counter = historyList.length;
     for (let child of historyList) {
-        child.style.top = (WORD_DISPLAY_OFFSET * counter) + "cap";
+        child.style.bottom = (WORD_DISPLAY_OFFSET * counter + 1) + "cap";
         counter--;
     }
 }
@@ -221,7 +226,7 @@ function constructWordDisplay(word) {
     let newBlock = document.createElement("div");
     newBlock.className = "wordDisplay text-lg gameplayText smoothMovement";
     newBlock.innerHTML = word;
-    newBlock.style.top = "0";
+    newBlock.style.bottom = "1cap";
 
     return newBlock;
 }
@@ -332,7 +337,7 @@ function undo() {
     oldInput.hidden = false;
 
     INPUT_CONTAINER.style.transition = "none";
-    INPUT_CONTAINER.style.top = WORD_DISPLAY_OFFSET + "cap"; // add the class so it moves immediately
+    INPUT_CONTAINER.style.bottom = WORD_DISPLAY_OFFSET + "cap"; // add the class so it moves immediately
     WORD_INPUT.value = lastWord;
 
     let historyContainer = document.getElementById("historyContainer");
@@ -341,8 +346,8 @@ function undo() {
 
     setTimeout(() => {
         // remove the class and begin the down animation
-        INPUT_CONTAINER.style.transition = "top 0.3s ease-out";
-        INPUT_CONTAINER.style.top = "0";
+        INPUT_CONTAINER.style.transition = "bottom 0.3s ease-out";
+        INPUT_CONTAINER.style.bottom = "0";
 
         // fade out old text
         oldInput.style.animation = "hide 0.3s forwards";

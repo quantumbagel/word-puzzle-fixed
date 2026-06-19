@@ -109,6 +109,8 @@ body {
 
     overflow-y: auto;
     height: 50vh;
+
+    scrollbar-gutter: stable both-edges;
 }
 
 #moveCounter {

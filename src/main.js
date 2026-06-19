@@ -117,6 +117,8 @@ function victoryAnimation() {
         victoryFlex.append(newBlock);
     }
 
+    victoryFlex.scrollTop = victoryFlex.scrollHeight; // force the scroll to start at the bottom
+
     let finalWord = victoryFlex.children[victoryFlex.children.length - 1];
     finalWord.classList.remove("wordHistory");
     finalWord.style.animation = "victory 3s ease-in-out 2s forwards";

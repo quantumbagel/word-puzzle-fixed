@@ -92,18 +92,18 @@ body {
 
 #victoryText {
     position: absolute;
-    /* Added left: 50% to ensure correct horizontal centering alignment */
+    /* left: 50% to ensure correct horizontal centering alignment */
     left: 50%;
     transform: translate(-50%, 0);
 
-    /* Changed top from 70px to -30px to position stats cleanly relative to the victory layout container */
+    /* top from 70px to -30px to position stats cleanly relative to the victory layout container */
     top: -30px;
 
     width: 20rem;
     text-align: center;
 
     font-size: 32px;
-    /* Added z-index: 5 to ensure text elements stay properly layered relative to overlays and animations */
+    /* z-index: 5 to ensure text elements stay properly layered relative to overlays and animations */
     z-index: 5; /* so we are hidden by the animation */
 }
 
@@ -123,7 +123,7 @@ body {
     /* Prevent it from intercepting clicks */
     pointer-events: none;
 
-    /* Added transform transition to smoothly animate list shifting upwards during victory */
+    /* transform transition to smoothly animate list shifting upwards during victory */
     transition: transform 0.8s cubic-bezier(0.25, 1, 0.25, 1); /* nice popup animation */
 }
 
@@ -162,7 +162,7 @@ body {
     );
 }
 
-/* Added victory-active styling to transition historyList behavior upon winning */
+/* victory-active styling to transition historyList behavior upon winning */
 .victory-active #historyList {
     /* Allow scrolling and pointer interaction so user can review their past moves */
     overflow-x: hidden !important;

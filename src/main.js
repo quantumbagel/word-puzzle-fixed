@@ -234,7 +234,7 @@ function hideHelpText() {
     helpText.style.animation = "hide 0.4s forwards";
 }
 
-// Added timeouts to track fading transitions of gameplay alert messages
+// timeouts to track fading transitions of gameplay alert messages
 let alertTimeout;
 let alertHideTimeout;
 
@@ -552,7 +552,7 @@ function correctScreenSize() {
     let PX_PER_CAP = LG_FONT_SIZE_PX * 0.638; // figure out conversion between cap units and px
     let wordDisplayHeight = PX_PER_CAP * 2.25;
 
-    // Added logic to calculate virtual keyboard height in mobile view to prevent layout overlap
+    // logic to calculate virtual keyboard height in mobile view to prevent layout overlap
     let keyboardHeight = 0;
     let keyboardContainer = document.getElementById("keyboardContainer");
     let victoryContainer = document.getElementById("victoryContainer");
@@ -579,7 +579,7 @@ function correctScreenSize() {
 
     // Figure out how many words we can show in the history display (including input box)
     let maxDisplays = Math.floor(availableDisplayHeight / wordDisplayHeight);
-    // Added safety floor of 1 display height to ensure layout doesn't break/vanish on short screens
+    // safety floor of 1 display height to ensure layout doesn't break/vanish on short screens
     if (maxDisplays < 1) maxDisplays = 1;
     let historyDisplayHeight = maxDisplays * 2 + (maxDisplays - 1) * 0.25;
 
@@ -610,7 +610,7 @@ document.getElementById("historyList").addEventListener("scroll", function () {
 
 function startGame(startWord, targetWord, history=[]) {
     resetGame(startWord, targetWord, history);
-    // Added removal of victory-active class to clean up styling when a new game starts
+    // removal of victory-active class to clean up styling when a new game starts
     document.body.classList.remove("victory-active");
 
     // Storage for persistent levels
@@ -623,7 +623,7 @@ function startGame(startWord, targetWord, history=[]) {
 
     let victoryContainer = document.getElementById("victoryContainer");
     victoryContainer.hidden = true;
-    // Added correctScreenSize invocation to re-calculate UI dimensions since keyboard or victory heights changed
+    // correctScreenSize invocation to re-calculate UI dimensions since keyboard or victory heights changed
     correctScreenSize();
 
     // clear history display

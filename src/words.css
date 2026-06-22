@@ -15,7 +15,7 @@
     line-height: 2cap;
 
     color: white;
-    /* Added white-space: nowrap to prevent 5-letter words from breaking onto multiple lines which happened for some stupid reason*/
+    /* white-space: nowrap to prevent 5-letter words from breaking onto multiple lines which happened for some stupid reason*/
     white-space: nowrap;
     /*text-align: center;*/
 }

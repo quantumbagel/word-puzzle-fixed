@@ -1,5 +1,7 @@
 :root {
     font-family: sans-serif;
+
+    --history-display-height: 8.75cap;
 }
 
 body {
@@ -102,11 +104,73 @@ body {
 
 #victoryFlex {
     position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: -1.25cap; /* The extra positioning is to make up for the scroll fade padding */
+
+    gap: 0.25cap;
+
+
+    overflow-x: visible;
+    overflow-y: auto;
+    height: var(--history-display-height);
+    padding-top: 0.25cap; /* Adding the padding allows for us to add the scroll fade*/
+    padding-bottom: 0.25cap;
+
+    scrollbar-gutter: stable both-edges;
+}
+
+#historyList {
+    position: absolute;
     transform: translate(-50%, 0);
     bottom: -1cap;
 
-    gap: 0.25cap;
+    overflow-x: visible;
+    overflow-y: hidden;
+    height: var(--history-display-height);
+    width: 7ch;
+
+    padding-top: 0.25cap;
+
+    /* Prevent it from intercepting clicks */
+    pointer-events: none;
 }
+
+/* Ensures all history displays are centered */
+#historyList > * {
+    left: 50%;
+}
+
+.scroll-fade-top {
+    position: absolute;
+    bottom: calc(var(--history-display-height) - 1cap);
+    left: 50%;
+    transform: translate(-50%, 0);
+    height: 0.25cap;
+    width: 7ch;
+    pointer-events: none;
+    background: linear-gradient(
+            to bottom,
+            white,
+            transparent
+    );
+}
+
+.scroll-fade-bottom {
+    position: absolute;
+    top: 1cap;
+    left: 50%;
+    transform: translate(-50%, 0);
+    height: 0.25cap;
+    width: 7ch;
+    pointer-events: none;
+    background: linear-gradient(
+            to top,
+            white,
+            transparent
+    );
+}
+
 
 #moveCounter {
     font-weight: bold;

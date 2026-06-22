@@ -2,7 +2,7 @@
 /* Base classes applied to most words */
 .wordDisplay {
     position: absolute;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, 50%);
 
     background-color: darkgray;
     border: none;
@@ -31,7 +31,7 @@
 }
 
 .smoothMovement {
-    transition: top 0.3s ease-out, opacity 0.3s linear;
+    transition: bottom 0.3s ease-out, opacity 0.3s linear;
 }
 
 /* Specific types of words */

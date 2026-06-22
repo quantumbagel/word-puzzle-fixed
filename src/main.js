@@ -15,7 +15,8 @@ const CLOSE_HELP_BUTTON = document.getElementById("closeHelp");
 const FAKE_CARET = document.getElementById("caret");
 
 let MOBILE_MODE = null;
-const WORD_DISPLAY_OFFSET = -2.25; // in cap
+let LG_FONT_SIZE_PX = 0;
+const WORD_DISPLAY_OFFSET = 2.25; // in cap
 
 /* Animation Functions */
 
@@ -29,6 +30,7 @@ function beginGameAnimation() {
     targetContainer.style.animation = "none";
 
     let gameContainer = document.getElementById("gameContainer");
+    gameContainer.style.animation = "none";
     gameContainer.hidden = false;
 
     INPUT_CONTAINER.hidden = true;
@@ -73,6 +75,10 @@ function resumeGameAnimation() {
     gameContainer.hidden = false;
     gameContainer.style.animation = "reveal 3s ease-in-out";
 
+    let historyContainer = document.getElementById("historyContainer");
+    historyContainer.hidden = false;
+    historyContainer.style.animation = "reveal 3s ease-in-out";
+
     let keyboardContainer = document.getElementById("keyboardContainer");
     keyboardContainer.hidden = false;
     keyboardContainer.style.animation = "reveal 3s ease-in-out";
@@ -105,17 +111,19 @@ function victoryAnimation() {
 
     let firstBlock = constructWordDisplay(STARTING_WORD);
     firstBlock.classList.add("static", "startingWord");
-    firstBlock.style.top = "";
+    firstBlock.style.bottom = "";
     victoryFlex.append(firstBlock);
 
     for (const word of HISTORY) {
         let newBlock = constructWordDisplay(word);
         newBlock.classList.add("wordHistory");
         newBlock.classList.add("static");
-        newBlock.style.top = "";
+        newBlock.style.bottom = "";
 
         victoryFlex.append(newBlock);
     }
+
+    victoryFlex.scrollTop = victoryFlex.scrollHeight; // force the scroll to start at the bottom
 
     let finalWord = victoryFlex.children[victoryFlex.children.length - 1];
     finalWord.classList.remove("wordHistory");
@@ -174,13 +182,13 @@ function badSubmit() {
 }
 
 function formatHistory() {
-    let historyContainer = document.getElementById("historyContainer");
+    let historyListElement = document.getElementById("historyList");
 
     // update positions
-    let historyList = historyContainer.children;
+    let historyList = historyListElement.children;
     let counter = historyList.length;
     for (let child of historyList) {
-        child.style.top = (WORD_DISPLAY_OFFSET * counter) + "cap";
+        child.style.bottom = (WORD_DISPLAY_OFFSET * counter + 1) + "cap";
         counter--;
     }
 }
@@ -219,7 +227,7 @@ function constructWordDisplay(word) {
     let newBlock = document.createElement("div");
     newBlock.className = "wordDisplay text-lg gameplayText smoothMovement";
     newBlock.innerHTML = word;
-    newBlock.style.top = "0";
+    newBlock.style.bottom = "1cap";
 
     return newBlock;
 }
@@ -301,8 +309,8 @@ function submitWord() {
         // Update visuals
         let newDisplay = constructWordHistory(word, lastWord);
 
-        let historyContainer = document.getElementById("historyContainer");
-        historyContainer.append(newDisplay);
+        let historyListElement = document.getElementById("historyList");
+        historyListElement.append(newDisplay);
 
         setTimeout(() => {
             newDisplay.classList.add("wordHistory")
@@ -312,14 +320,18 @@ function submitWord() {
 }
 
 function undo() {
-    playSound("undo");
-
     if (HISTORY.length <= 0) {
+        if (WORD_INPUT.value === "") {
+            playSound("submit-fail");
+            return;
+        }
         // Just clear the input
+        playSound("undo");
         WORD_INPUT.value = "";
         return;
     }
 
+    playSound("undo");
     let lastWord = HISTORY.pop();
     sessionStorage.setItem("history", HISTORY.toString());
 
@@ -330,17 +342,17 @@ function undo() {
     oldInput.hidden = false;
 
     INPUT_CONTAINER.style.transition = "none";
-    INPUT_CONTAINER.style.top = WORD_DISPLAY_OFFSET + "cap"; // add the class so it moves immediately
+    INPUT_CONTAINER.style.bottom = WORD_DISPLAY_OFFSET + "cap"; // add the class so it moves immediately
     WORD_INPUT.value = lastWord;
 
-    let historyContainer = document.getElementById("historyContainer");
-    let historyList = historyContainer.children;
-    historyContainer.removeChild(historyList[historyList.length - 1]);
+    let historyListElement = document.getElementById("historyList");
+    let historyList = historyListElement.children;
+    historyListElement.removeChild(historyList[historyList.length - 1]);
 
     setTimeout(() => {
         // remove the class and begin the down animation
-        INPUT_CONTAINER.style.transition = "top 0.3s ease-out";
-        INPUT_CONTAINER.style.top = "0";
+        INPUT_CONTAINER.style.transition = "bottom 0.3s ease-out";
+        INPUT_CONTAINER.style.bottom = "0";
 
         // fade out old text
         oldInput.style.animation = "hide 0.3s forwards";
@@ -445,11 +457,26 @@ keyboardButtons.forEach(function (button) {
 
 
 function correctScreenSize() {
+    // Start by figuring out the pixel dimensions of the word displays
+    LG_FONT_SIZE_PX = Number.parseInt(getComputedStyle(document.querySelector(".text-lg")).getPropertyValue("font-size"));
+    let PX_PER_CAP = LG_FONT_SIZE_PX * 0.638; // figure out conversion between cap units and px
+    let wordDisplayHeight = PX_PER_CAP * 2.25;
+    let availableDisplayHeight = window.innerHeight / 2;
+
+    // Determine if mobile mode is necessary
     if (window.innerWidth <= 512 && !MOBILE_MODE) {
         setMobileMode(true);
+        availableDisplayHeight -= 24; // In mobile mode, credits are at the top, so we need to leave extra room
     } else if (window.innerWidth > 512 && (MOBILE_MODE || MOBILE_MODE === null)) {
         setMobileMode(false);
     }
+
+    // Figure out how many words we can show in the history display (including input box)
+    let maxDisplays = Math.floor(availableDisplayHeight / wordDisplayHeight);
+    let historyDisplayHeight = maxDisplays * 2 + (maxDisplays - 1) * 0.25;
+    // Set the display height variable to match
+    let r = document.querySelector(":root");
+    r.style.setProperty("--history-display-height", historyDisplayHeight + "cap");
 }
 
 addEventListener("resize", function (event) {
@@ -475,13 +502,13 @@ function startGame(startWord, targetWord, history=[]) {
     victoryContainer.hidden = true;
 
     // clear history display
-    let historyContainer = document.getElementById("historyContainer");
-    historyContainer.replaceChildren();
+    let historyListElement = document.getElementById("historyList");
+    historyListElement.replaceChildren();
 
     let startingWordContainer = constructWordDisplay(STARTING_WORD);
     startingWordContainer.id = "startingWord";
     startingWordContainer.classList.add("startingWord");
-    historyContainer.append(startingWordContainer);
+    historyListElement.append(startingWordContainer);
 
     let victoryVideo = document.getElementById("victoryVideo");
     victoryVideo.currentTime = 0;
@@ -497,7 +524,7 @@ function startGame(startWord, targetWord, history=[]) {
             let newDisplay = constructWordHistory(word, lastWord);
             newDisplay.classList.add("wordHistory");
 
-            historyContainer.append(newDisplay);
+            historyListElement.append(newDisplay);
             lastWord = word;
         }
 

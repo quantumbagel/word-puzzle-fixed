@@ -51,12 +51,19 @@
 
         <!-- Past moves -->
         <div id="historyContainer" class="gameplayText text-lg" hidden>
-            <div id="startingWord" class="wordDisplay text-lg gameplayText smoothMovement startingWord" style="bottom: 1cap;"></div>
+            <div id="historyList" class="gameplayText text-lg">
+                <div id="startingWord" class="wordDisplay text-lg gameplayText smoothMovement startingWord" style="bottom: 1cap;"></div>
+            </div>
+            <div class="gameplayText text-lg scroll-fade-top"></div>
         </div>
 
         <!-- Victory stuff -->
         <div id="victoryContainer" hidden>
-            <div id="victoryFlex" class="gameplayText text-lg flex flex-col"></div>
+            <div id="victoryList" class="gameplayText text-lg">
+                <div id="victoryFlex" class="gameplayText text-lg flex flex-col"></div>
+                <div class="gameplayText text-lg scroll-fade-top"></div>
+                <div class="gameplayText text-lg scroll-fade-bottom"></div>
+            </div>
 
             <div id="victoryText" hidden>
                 You got it in <br/>

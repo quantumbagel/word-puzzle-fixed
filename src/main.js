@@ -15,6 +15,7 @@ const CLOSE_HELP_BUTTON = document.getElementById("closeHelp");
 const FAKE_CARET = document.getElementById("caret");
 
 let MOBILE_MODE = null;
+let LG_FONT_SIZE_PX = 0;
 const WORD_DISPLAY_OFFSET = 2.25; // in cap
 
 /* Animation Functions */
@@ -181,10 +182,10 @@ function badSubmit() {
 }
 
 function formatHistory() {
-    let historyContainer = document.getElementById("historyContainer");
+    let historyListElement = document.getElementById("historyList");
 
     // update positions
-    let historyList = historyContainer.children;
+    let historyList = historyListElement.children;
     let counter = historyList.length;
     for (let child of historyList) {
         child.style.bottom = (WORD_DISPLAY_OFFSET * counter + 1) + "cap";
@@ -308,8 +309,8 @@ function submitWord() {
         // Update visuals
         let newDisplay = constructWordHistory(word, lastWord);
 
-        let historyContainer = document.getElementById("historyContainer");
-        historyContainer.append(newDisplay);
+        let historyListElement = document.getElementById("historyList");
+        historyListElement.append(newDisplay);
 
         setTimeout(() => {
             newDisplay.classList.add("wordHistory")
@@ -344,9 +345,9 @@ function undo() {
     INPUT_CONTAINER.style.bottom = WORD_DISPLAY_OFFSET + "cap"; // add the class so it moves immediately
     WORD_INPUT.value = lastWord;
 
-    let historyContainer = document.getElementById("historyContainer");
-    let historyList = historyContainer.children;
-    historyContainer.removeChild(historyList[historyList.length - 1]);
+    let historyListElement = document.getElementById("historyList");
+    let historyList = historyListElement.children;
+    historyListElement.removeChild(historyList[historyList.length - 1]);
 
     setTimeout(() => {
         // remove the class and begin the down animation
@@ -456,11 +457,26 @@ keyboardButtons.forEach(function (button) {
 
 
 function correctScreenSize() {
+    // Start by figuring out the pixel dimensions of the word displays
+    LG_FONT_SIZE_PX = Number.parseInt(getComputedStyle(document.querySelector(".text-lg")).getPropertyValue("font-size"));
+    let PX_PER_CAP = LG_FONT_SIZE_PX * 0.638; // figure out conversion between cap units and px
+    let wordDisplayHeight = PX_PER_CAP * 2.25;
+    let availableDisplayHeight = window.innerHeight / 2;
+
+    // Determine if mobile mode is necessary
     if (window.innerWidth <= 512 && !MOBILE_MODE) {
         setMobileMode(true);
+        availableDisplayHeight -= 24; // In mobile mode, credits are at the top, so we need to leave extra room
     } else if (window.innerWidth > 512 && (MOBILE_MODE || MOBILE_MODE === null)) {
         setMobileMode(false);
     }
+
+    // Figure out how many words we can show in the history display (including input box)
+    let maxDisplays = Math.floor(availableDisplayHeight / wordDisplayHeight);
+    let historyDisplayHeight = maxDisplays * 2 + (maxDisplays - 1) * 0.25;
+    // Set the display height variable to match
+    let r = document.querySelector(":root");
+    r.style.setProperty("--history-display-height", historyDisplayHeight + "cap");
 }
 
 addEventListener("resize", function (event) {
@@ -486,13 +502,13 @@ function startGame(startWord, targetWord, history=[]) {
     victoryContainer.hidden = true;
 
     // clear history display
-    let historyContainer = document.getElementById("historyContainer");
-    historyContainer.replaceChildren();
+    let historyListElement = document.getElementById("historyList");
+    historyListElement.replaceChildren();
 
     let startingWordContainer = constructWordDisplay(STARTING_WORD);
     startingWordContainer.id = "startingWord";
     startingWordContainer.classList.add("startingWord");
-    historyContainer.append(startingWordContainer);
+    historyListElement.append(startingWordContainer);
 
     let victoryVideo = document.getElementById("victoryVideo");
     victoryVideo.currentTime = 0;
@@ -508,7 +524,7 @@ function startGame(startWord, targetWord, history=[]) {
             let newDisplay = constructWordHistory(word, lastWord);
             newDisplay.classList.add("wordHistory");
 
-            historyContainer.append(newDisplay);
+            historyListElement.append(newDisplay);
             lastWord = word;
         }
 

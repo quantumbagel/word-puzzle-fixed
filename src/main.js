@@ -37,29 +37,31 @@ function beginGameAnimation() {
 
     let historyContainer = document.getElementById("historyContainer");
     historyContainer.hidden = false;
-    historyContainer.style.animation = "reveal 3s ease-in-out";
+    historyContainer.style.animation = "reveal 1s ease-in-out";
 
     let keyboardContainer = document.getElementById("keyboardContainer");
     keyboardContainer.hidden = true;
     keyboardContainer.style.animation = "none";
+    correctScreenSize();
 
     setTimeout(() => {
         targetContainer.hidden = false;
-        targetContainer.style.animation = "reveal 3s ease-in-out forwards";
+        targetContainer.style.animation = "reveal 1s ease-in-out forwards";
 
         setTimeout( () => {
             revealInputAnimation();
             buttonContainer.hidden = false;
-            buttonContainer.style.animation = "reveal 2s ease-in-out";
+            buttonContainer.style.animation = "reveal 0.8s ease-in-out";
 
             let keyboardContainer = document.getElementById("keyboardContainer");
             keyboardContainer.hidden = false;
-            keyboardContainer.style.animation = "reveal 2s ease-in-out";
+            keyboardContainer.style.animation = "reveal 0.8s ease-in-out";
+            correctScreenSize();
 
             WORD_INPUT.focus();
-        }, 3000);
+        }, 1000);
 
-    }, 3000);
+    }, 1000);
 }
 
 function resumeGameAnimation() {
@@ -73,19 +75,20 @@ function resumeGameAnimation() {
 
     let gameContainer = document.getElementById("gameContainer");
     gameContainer.hidden = false;
-    gameContainer.style.animation = "reveal 3s ease-in-out";
+    gameContainer.style.animation = "reveal 1s ease-in-out";
 
     let historyContainer = document.getElementById("historyContainer");
     historyContainer.hidden = false;
-    historyContainer.style.animation = "reveal 3s ease-in-out";
+    historyContainer.style.animation = "reveal 1s ease-in-out";
 
     let keyboardContainer = document.getElementById("keyboardContainer");
     keyboardContainer.hidden = false;
-    keyboardContainer.style.animation = "reveal 3s ease-in-out";
+    keyboardContainer.style.animation = "reveal 1s ease-in-out";
+    correctScreenSize();
 
     setTimeout(() => {
         WORD_INPUT.focus();
-    }, 3000);
+    }, 1000);
 }
 
 let CANCEL_VICTORY_ANIMATION = false
@@ -93,41 +96,31 @@ function victoryAnimation() {
     CANCEL_VICTORY_ANIMATION = false;
 
     let gameContainer = document.getElementById("gameContainer");
-    gameContainer.style.animation = "hide 2s ease-in-out forwards";
+    gameContainer.style.animation = "hide 0.8s ease-in-out forwards";
 
     let keyboardContainer = document.getElementById("keyboardContainer");
-    keyboardContainer.style.animation = "hide 2s ease-in-out forwards";
+    keyboardContainer.style.animation = "hide 0.8s ease-in-out forwards";
+
+    // victory-active class to body to trigger CSS transitions and scroll styling
+    document.body.classList.add("victory-active");
 
     let victoryContainer = document.getElementById("victoryContainer");
     victoryContainer.hidden = false;
+    correctScreenSize();
 
-    // Fill out history display
-    let historyContainer = document.getElementById("historyContainer");
-    historyContainer.hidden = true;
-
-    // update positions
-    let victoryFlex = document.getElementById("victoryFlex");
-    victoryFlex.replaceChildren();
-
-    let firstBlock = constructWordDisplay(STARTING_WORD);
-    firstBlock.classList.add("static", "startingWord");
-    firstBlock.style.bottom = "";
-    victoryFlex.append(firstBlock);
-
-    for (const word of HISTORY) {
-        let newBlock = constructWordDisplay(word);
-        newBlock.classList.add("wordHistory");
-        newBlock.classList.add("static");
-        newBlock.style.bottom = "";
-
-        victoryFlex.append(newBlock);
+    // final word green in history list with a delay, and combine it with the pop animation
+    let historyListElement = document.getElementById("historyList");
+    let finalWord = historyListElement.children[historyListElement.children.length - 1];
+    if (finalWord) {
+        finalWord.classList.remove("wordHistory");
+        // Combine pop animation and delayed transition to green
+        finalWord.style.animation = "anagram-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, victory 1.5s ease-in-out 0.4s forwards";
     }
 
-    victoryFlex.scrollTop = victoryFlex.scrollHeight; // force the scroll to start at the bottom
-
-    let finalWord = victoryFlex.children[victoryFlex.children.length - 1];
-    finalWord.classList.remove("wordHistory");
-    finalWord.style.animation = "victory 3s ease-in-out 2s forwards";
+    // Scroll to bottom of history list
+    setTimeout(() => {
+        historyListElement.scrollTop = historyListElement.scrollHeight;
+    }, 100);
 
     let victoryText = document.getElementById("victoryText");
     victoryText.hidden = true;
@@ -137,10 +130,12 @@ function victoryAnimation() {
 
     let victoryVideo = document.getElementById("victoryVideo");
     victoryVideo.hidden = true;
+    victoryVideo.style.animation = "none";
 
-    //sfx
+    // Play victory music
     playSound("victoryPiano");
 
+    // Show stats and Try Again button after 0.8 seconds
     setTimeout( () => {
         if (CANCEL_VICTORY_ANIMATION) {
             CANCEL_VICTORY_ANIMATION = false;
@@ -148,9 +143,10 @@ function victoryAnimation() {
         }
 
         victoryText.hidden = false;
-        victoryText.style.animation = "reveal 3s ease-in-out forwards";
-    }, 5000)
+        victoryText.style.animation = "reveal 0.8s ease-in-out forwards";
+    }, 800);
 
+    // Play video (GIF popup) after 0.8 seconds
     setTimeout(() => {
         if (CANCEL_VICTORY_ANIMATION) {
             CANCEL_VICTORY_ANIMATION = false;
@@ -158,6 +154,7 @@ function victoryAnimation() {
         }
 
         victoryVideo.hidden = false;
+        victoryVideo.style.animation = "popup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards";
         victoryVideo.play();
 
         setTimeout( () => {
@@ -168,7 +165,19 @@ function victoryAnimation() {
 
             playSound("victoryPathetic");
         }, 200);
-    }, 12500);
+    }, 800);
+
+    // Hide video when it finishes playing
+    const handleVideoEnded = () => {
+        victoryVideo.style.animation = "popout 0.4s cubic-bezier(0.36, 0, 0.66, -0.56) forwards";
+        setTimeout(() => {
+            victoryVideo.hidden = true;
+        }, 400);
+    };
+
+    victoryVideo.removeEventListener("ended", victoryVideo._endedListener);
+    victoryVideo._endedListener = handleVideoEnded;
+    victoryVideo.addEventListener("ended", handleVideoEnded);
 }
 
 function badSubmit() {
@@ -201,7 +210,7 @@ function revealInputAnimation() {
 
     setTimeout(() => {
         formatHistory();
-        INPUT_CONTAINER.style.animation = "reveal 1s";
+        INPUT_CONTAINER.style.animation = "reveal 0.5s";
     });
 }
 
@@ -211,21 +220,67 @@ function revealHelpText() {
     cover.hidden = false;
     helpText.hidden = false;
 
-    cover.style.animation = "reveal 1s forwards";
-    helpText.style.animation = "reveal 1s forwards";
+    // Sped up reveal animation from 1s to 0.4s for snappier UI feel
+    cover.style.animation = "reveal 0.4s forwards";
+    helpText.style.animation = "reveal 0.4s forwards";
 }
 
 function hideHelpText() {
     let cover = document.getElementById("cover");
     let helpText = document.getElementById("helpText");
 
-    cover.style.animation = "hide 1s forwards";
-    helpText.style.animation = "hide 1s forwards";
+    // Sped up hide animation from 1s to 0.4s for snappier UI feel
+    cover.style.animation = "hide 0.4s forwards";
+    helpText.style.animation = "hide 0.4s forwards";
+}
+
+// Added timeouts to track fading transitions of gameplay alert messages
+let alertTimeout;
+let alertHideTimeout;
+
+// function to display temporary in-game error/validation messages
+function showAlert(message) {
+    const alertEl = document.getElementById("alertMessage");
+    if (!alertEl) return;
+
+    alertEl.textContent = message;
+    alertEl.hidden = false;
+    void alertEl.offsetWidth; // Force reflow to trigger opacity transition
+    alertEl.style.opacity = "1";
+
+    clearTimeout(alertTimeout);
+    clearTimeout(alertHideTimeout);
+
+    alertTimeout = setTimeout(() => {
+        alertEl.style.opacity = "0";
+        alertHideTimeout = setTimeout(() => {
+            alertEl.hidden = true;
+        }, 200); // Wait for fade-out transition to finish
+    }, 1500);
+}
+
+// highlight a previously submitted word in the history list if user enters a duplicate
+function highlightDuplicateInHistory(word) {
+    let historyListElement = document.getElementById("historyList");
+    if (!historyListElement) return;
+
+    for (let child of historyListElement.children) {
+        // Match the element using the dataset word attribute
+        if (child.dataset.word === word) {
+            child.classList.add("duplicateHighlight");
+            setTimeout(() => {
+                child.classList.remove("duplicateHighlight");
+            }, 600);
+            break;
+        }
+    }
 }
 
 function constructWordDisplay(word) {
     let newBlock = document.createElement("div");
     newBlock.className = "wordDisplay text-lg gameplayText smoothMovement";
+    // Set dataset.word attribute to locate and highlight this block later if a duplicate is entered
+    newBlock.dataset.word = word;
     newBlock.innerHTML = word;
     newBlock.style.bottom = "1cap";
 
@@ -235,21 +290,23 @@ function constructWordDisplay(word) {
 function constructWordHistory(word, lastWord) {
     let newDisplay = constructWordDisplay(word);
 
-    // We're ignoring all this for now
-    // Hopefully we find a better way of indicating moves later
-    /*
+    // Re-enabled the letter change and anagram checking to style individual move characters properly
     const letterIdx = checkForLetterChange(lastWord, word);
 
     if (letterIdx >= 0) {
+        // Highlighting the single changed letter between the last word and the new word
         let firstSegment = word.slice(0, letterIdx);
         let secondSegment = "<span class='letterMove'>" + word[letterIdx] + "</span>";
         let thirdSegment = word.slice(letterIdx + 1, word.length);
 
         newDisplay.innerHTML = firstSegment + secondSegment + thirdSegment;
     } else {
+        // For anagrams, apply an animation class and wrap each letter in a span with staggered delay
         newDisplay.classList.add("anagramMove");
+        newDisplay.innerHTML = word.split("").map((char, index) => {
+            return `<span class="anagramLetter" style="animation-delay: ${index * 60}ms">${char}</span>`;
+        }).join("");
     }
-    /* */
 
     return newDisplay;
 }
@@ -265,8 +322,25 @@ let remainingSounds = [...SUBMIT_SOUNDS];
 function submitWord() {
     let word = WORD_INPUT.value.toUpperCase();
 
+    // check to ensure exactly 5 letters are entered, showing a custom alert on failure
+    if (word.length !== 5) {
+        badSubmit();
+        showAlert("MUST BE 5 LETTERS");
+        return;
+    }
+
+    // word list check
     if (!assertValidWord(word)) {
         badSubmit();
+        showAlert("NOT IN WORD LIST");
+        return;
+    }
+
+    // duplicate check
+    if (word === STARTING_WORD || HISTORY.includes(word)) {
+        badSubmit();
+        showAlert("ALREADY DONE THIS WORD");
+        highlightDuplicateInHistory(word);
         return;
     }
 
@@ -274,15 +348,12 @@ function submitWord() {
     if (HISTORY.length > 0)
         lastWord = HISTORY[HISTORY.length - 1];
 
-    if (lastWord === word) {
-        badSubmit();
-        return;
-    }
-
     // Check for a valid move
     let letterIdx = checkForLetterChange(lastWord, word);
+    // invalid moves (not 1 letter difference and not an anagram)
     if (letterIdx < 0 && !checkForAnagram(lastWord, word)) {
         badSubmit();
+        showAlert("INVALID MOVE");
         return;
     }
 
@@ -294,7 +365,18 @@ function submitWord() {
 
     // Did we win?
     if (word === TARGET_WORD) {
-        // We did win!
+        // We did win! Force the pop-flip victory effect by treating it like an anagram visual,
+        // manually building the victory word block and appending it to the history list before ending the game.
+        let newDisplay = constructWordDisplay(word);
+        newDisplay.classList.add("anagramMove");
+        newDisplay.innerHTML = word.split("").map((char, index) => {
+            return `<span class="anagramLetter" style="animation-delay: ${index * 60}ms">${char}</span>`;
+        }).join("");
+        newDisplay.classList.add("wordHistory");
+        let historyListElement = document.getElementById("historyList");
+        historyListElement.append(newDisplay);
+        formatHistory();
+
         endGame();
 
     } else {
@@ -457,23 +539,50 @@ keyboardButtons.forEach(function (button) {
 
 
 function correctScreenSize() {
+    // Dynamically toggle mobile layout based on window width
+    const isMobileSize = window.innerWidth <= 512;
+    if (isMobileSize && !MOBILE_MODE) {
+        setMobileMode(true);
+    } else if (!isMobileSize && (MOBILE_MODE || MOBILE_MODE === null)) {
+        setMobileMode(false);
+    }
+
     // Start by figuring out the pixel dimensions of the word displays
     LG_FONT_SIZE_PX = Number.parseInt(getComputedStyle(document.querySelector(".text-lg")).getPropertyValue("font-size"));
     let PX_PER_CAP = LG_FONT_SIZE_PX * 0.638; // figure out conversion between cap units and px
     let wordDisplayHeight = PX_PER_CAP * 2.25;
-    let availableDisplayHeight = window.innerHeight / 2;
 
-    // Determine if mobile mode is necessary
-    if (window.innerWidth <= 512 && !MOBILE_MODE) {
-        setMobileMode(true);
+    // Added logic to calculate virtual keyboard height in mobile view to prevent layout overlap
+    let keyboardHeight = 0;
+    let keyboardContainer = document.getElementById("keyboardContainer");
+    let victoryContainer = document.getElementById("victoryContainer");
+    let isVictory = victoryContainer && !victoryContainer.hidden;
+
+    if (MOBILE_MODE && !isVictory && keyboardContainer) {
+        keyboardHeight = keyboardContainer.offsetHeight || 190;
+    }
+
+    // Deduct keyboard height from total window height to compute active/visible viewport area
+    let activeHeight = window.innerHeight - keyboardHeight;
+    let availableDisplayHeight = activeHeight / 2;
+
+    if (MOBILE_MODE) {
         availableDisplayHeight -= 24; // In mobile mode, credits are at the top, so we need to leave extra room
-    } else if (window.innerWidth > 512 && (MOBILE_MODE || MOBILE_MODE === null)) {
-        setMobileMode(false);
+    }
+
+    // Reposition the main center container relative to the newly calculated active height
+    let gameCenterY = activeHeight / 2;
+    let centerContainer = document.querySelector(".center");
+    if (centerContainer) {
+        centerContainer.style.top = gameCenterY + "px";
     }
 
     // Figure out how many words we can show in the history display (including input box)
     let maxDisplays = Math.floor(availableDisplayHeight / wordDisplayHeight);
+    // Added safety floor of 1 display height to ensure layout doesn't break/vanish on short screens
+    if (maxDisplays < 1) maxDisplays = 1;
     let historyDisplayHeight = maxDisplays * 2 + (maxDisplays - 1) * 0.25;
+
     // Set the display height variable to match
     let r = document.querySelector(":root");
     r.style.setProperty("--history-display-height", historyDisplayHeight + "cap");
@@ -483,12 +592,26 @@ addEventListener("resize", function (event) {
     correctScreenSize();
 });
 
+// scroll listener to temporarily show scrollbars by applying the 'scrolling' class while user scrolls
+let scrollTimeout;
+document.getElementById("historyList").addEventListener("scroll", function () {
+    const historyList = this;
+    historyList.classList.add("scrolling");
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(function () {
+        historyList.classList.remove("scrolling");
+    }, 1000); // Hide the scrollbar after 1 second of scroll inactivity
+});
+
+
 
 
 //
 
 function startGame(startWord, targetWord, history=[]) {
     resetGame(startWord, targetWord, history);
+    // Added removal of victory-active class to clean up styling when a new game starts
+    document.body.classList.remove("victory-active");
 
     // Storage for persistent levels
     sessionStorage.setItem("startWord", startWord);
@@ -500,6 +623,8 @@ function startGame(startWord, targetWord, history=[]) {
 
     let victoryContainer = document.getElementById("victoryContainer");
     victoryContainer.hidden = true;
+    // Added correctScreenSize invocation to re-calculate UI dimensions since keyboard or victory heights changed
+    correctScreenSize();
 
     // clear history display
     let historyListElement = document.getElementById("historyList");

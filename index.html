@@ -42,6 +42,9 @@
                 </div>
             </div>
 
+            <!-- Added alertMessage to show feedback for incorrect, invalid, or duplicate submissions -->
+            <div id="alertMessage" class="gameplayText text-xs" hidden></div>
+
             <div id="targetContainer" class="flex flex-col place-items-center">
                 <span class="text-sm">Target:</span>
                 <span id="targetWord" class="text-lg gameplayText">CRYPT</span>
@@ -59,11 +62,7 @@
 
         <!-- Victory stuff -->
         <div id="victoryContainer" hidden>
-            <div id="victoryList" class="gameplayText text-lg">
-                <div id="victoryFlex" class="gameplayText text-lg flex flex-col"></div>
-                <div class="gameplayText text-lg scroll-fade-top"></div>
-                <div class="gameplayText text-lg scroll-fade-bottom"></div>
-            </div>
+            <!-- Removed victoryList/victoryFlex structure because historyList is now reused and repurposed on victory -->
 
             <div id="victoryText" hidden>
                 You got it in <br/>

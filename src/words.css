@@ -68,7 +68,13 @@
 
 .anagramMove {
     background-color: gold;
-    /* Added scale-pop animation when an anagram word is successfully played */
+    /* scale-pop animation when an anagram word is successfully played */
+    animation: anagram-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.victoryMove {
+    background-color: darkgray;
+    /* scale-pop animation when victory word is successfully played */
     animation: anagram-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
 }
 
@@ -76,6 +82,12 @@
 .anagramLetter {
     display: inline-block;
     animation: anagram-flip 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    transform-origin: center;
+}
+
+.victoryLetter {
+    display: inline-block;
+    animation: victory-flip 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
     transform-origin: center;
 }
 
@@ -101,6 +113,22 @@
     50% {
         transform: rotateY(180deg) scale(1.25);
         color: #ffeb3b;
+    }
+    100% {
+        transform: rotateY(360deg);
+        color: white;
+    }
+}
+
+/* flip each letter 360 degrees and shift color temporarily to green midway during victory */
+@keyframes victory-flip {
+    0% {
+        transform: rotateY(0deg);
+        color: white;
+    }
+    50% {
+        transform: rotateY(180deg) scale(1.25);
+        color: limegreen;
     }
     100% {
         transform: rotateY(360deg);

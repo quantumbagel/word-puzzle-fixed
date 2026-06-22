@@ -368,9 +368,9 @@ function submitWord() {
         // We did win! Force the pop-flip victory effect by treating it like an anagram visual,
         // manually building the victory word block and appending it to the history list before ending the game.
         let newDisplay = constructWordDisplay(word);
-        newDisplay.classList.add("anagramMove");
+        newDisplay.classList.add("victoryMove");
         newDisplay.innerHTML = word.split("").map((char, index) => {
-            return `<span class="anagramLetter" style="animation-delay: ${index * 60}ms">${char}</span>`;
+            return `<span class="victoryLetter" style="animation-delay: ${index * 60}ms">${char}</span>`;
         }).join("");
         newDisplay.classList.add("wordHistory");
         let historyListElement = document.getElementById("historyList");

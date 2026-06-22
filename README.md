@@ -4,6 +4,8 @@
 
 I just made the UI and webpage :)
 
+also julian is cool and I love him 🥰
+
 ## The Game
 The goal of the game is to get from the starting word to the target word
 in as few moves as possible.
